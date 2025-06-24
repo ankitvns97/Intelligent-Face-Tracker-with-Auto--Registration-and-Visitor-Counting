@@ -139,5 +139,5 @@ Configuration Parameters Explained:
             Sets the resolution for processing video frames. auto uses the original resolution; other options can downsample for speed or quality trade-offs.
 
 
-![Alt text]()
+![Alt text](flow.png)
 
