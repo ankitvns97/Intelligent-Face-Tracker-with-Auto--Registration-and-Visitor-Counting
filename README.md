@@ -141,3 +141,37 @@ Configuration Parameters Explained:
 
 ![Alt text](flow.png)
 
+
+Data Flow Description:
+
+The system begins by capturing video frames at a configurable interval, allowing control over processing speed and resource usage. These frames are then rescaled to a resolution of 1280×720 pixels, which provides an optimal balance between detection accuracy and computational efficiency.
+
+Detection and Tracking:
+Each frame is passed through the YOLOv8-face model, which identifies and localizes faces. To maintain consistent identity tracking across multiple frames, the system uses the DeepSORT algorithm. It leverages a Kalman filter to predict the position of faces between frames, helping to reduce tracking loss when a face briefly disappears or moves rapidly.
+
+Recognition:
+Once a face is detected and tracked, it is passed through FaceNet, which extracts a 512-dimensional embedding vector representing the facial features. The system compares this embedding to previously stored embeddings using cosine similarity. If a match is found above a similarity threshold, the face is considered recognized. Otherwise, a new face is automatically registered with an incremental ID.
+
+Event Handling:
+The system logs specific events during operation:
+An "Entry" event is triggered the first time a face is recognized.
+An "Exit" event is triggered when a tracked face has been missing for a specified timeout period.
+Each recognized face image is saved in a directory structure organized by date, allowing for chronological review.
+
+Storage:
+All relevant data is persistently stored:
+A SQLite database records metadata for each recognition event, including timestamps, face IDs, and event types.
+JPEG images are saved for each captured face to allow visual review.
+JSON logs store detailed system events for debugging, auditing, and analysis.
+
+Post-Processing:
+After data collection, the system performs clustering using the DBSCAN algorithm, grouping similar faces based on their embeddings. This clustering helps refine identity assignments and is used to update the identity mapping in the database. It also contributes to calculating the total number of unique visitors over the session.
+
+Output:
+The system generates multiple outputs:
+A real-time visualization of the video feed with face bounding boxes and identity labels.
+CSV exports containing logs of all entry and exit events.
+A set of sample images for verification or reporting purposes.
+Logging of key performance metrics, such as frames processed per second, recognition accuracy, and system uptime.
+
+This project is a part of a hackathon run by https://katomaran.com
